@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.env
+.env.*
+
+# Node
+node_modules/
+dist/
+
+# Herramientas
+.vscode/
+.idea/
+.DS_Store
+
+# Datos locales
+chroma_db/
+*.sqlite3
+
+# Scripts locales
+preparar.bat
+subir.bat
