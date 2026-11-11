@@ -57,14 +57,16 @@
 - `tests/test_consulta.py` **no se ejecutó** en este entorno porque no tenía instalados `fastapi` ni `httpx`. Debe ejecutarse en el equipo del proyecto (ejecución 2).
 - Pruebas manuales M-01, M-02, M-03, M-05 y M-06: se revisó la interfaz en Chrome (1280 px y 360 px) respondiendo la API con la misma lógica de `app/rag.py` y `app/generacion.py`.
 
-### Ejecución 2 — [fecha] (equipo del proyecto, Windows)
+### Ejecución 2 — 10 de noviembre de 2026 (equipo del proyecto, Windows)
 
-- Comando: `pytest -q`
-- Resultado: [pegar salida real]
-- Entorno: Windows, Python [versión]
+- Comando: `python -m pytest -q` (desde `preparar.bat`)
+- Resultado: **28 passed**, 0 failed, 1 warning (1.63 s)
+- Entorno: Windows, Python 3.12
+- Aviso: `StarletteDeprecationWarning` por usar `httpx` con `starlette.testclient`; no afecta los resultados.
+- Evidencia: `documentacion/evidencias/pytest-salida.txt`
 
 ### Fallos
-- [caso, mensaje, acción]
+- Ninguno en las ejecuciones 1 y 2.
 
 ### Riesgos pendientes
 - La búsqueda por palabra clave no reconoce sinónimos no listados (p. ej. "titularme" funciona por la raíz, pero "graduarme" no).
@@ -73,7 +75,7 @@
 
 ## 6. Criterios de salida
 
-- [ ] La suite automatizada completa pasa en el equipo del proyecto.
+- [x] La suite automatizada completa pasa en el equipo del proyecto.
 - [x] El caso sin evidencia no inventa fuentes.
 - [x] No hay secretos en el repositorio (`.gitignore` excluye `.env`).
 - [ ] La matriz manual está completa.
