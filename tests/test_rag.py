@@ -59,3 +59,12 @@ def test_sin_evidencia_devuelve_lista_vacia(pregunta):
 
 def test_respeta_el_limite():
     assert len(recuperar_fragmentos("requisitos de servicio social", limite=1)) == 1
+
+
+# Agregada en la delegación a @desarrollador (Día 2) y corregida en la revisión:
+# la primera versión del agente reemplazaba el archivo completo y usaba claves de la API.
+def test_reporte_de_actividades_devuelve_su_seccion():
+    fragmentos = recuperar_fragmentos("¿Cómo reporto actividades del servicio social?", limite=1)
+    assert fragmentos, "debería encontrar evidencia"
+    assert fragmentos[0]["documento"] == "servicio-social.md"
+    assert "Reportes de actividades" in fragmentos[0]["seccion"]

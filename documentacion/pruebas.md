@@ -65,6 +65,17 @@
 - Aviso: `StarletteDeprecationWarning` por usar `httpx` con `starlette.testclient`; no afecta los resultados.
 - Evidencia: `documentacion/evidencias/pytest-salida.txt`
 
+### Delegación a subagentes — 10 de noviembre de 2026 (OpenCode + Ollama `qwen3:8b`)
+
+| Subagente | Tarea | Resultado | Evidencia |
+|---|---|---|---|
+| `@arquitecto` | Impacto de ChromaDB en el contrato de `POST /api/consulta` | Correcto: el contrato no cambia, solo la lógica interna | `evidencias/arquitecto.png` |
+| `@disenador-web` | 3 mejoras de accesibilidad sin modificar archivos | Correcto, sin cambios en archivos | `evidencias/disenador.png` |
+| `@desarrollador` | Agregar prueba de "Reportes de actividades" | **Rechazado en revisión** (ver hallazgo) | `evidencias/desarrollador.png` |
+| `@tester` | Ejecutar `pytest -q` y `git status` | Pendiente | `evidencias/tester.png` |
+
+**Hallazgo en la revisión del desarrollador:** el agente reemplazó todo `tests/test_rag.py` (eliminó 13 pruebas existentes) y la prueba nueva usaba las claves `respuesta` y `fuentes`, que pertenecen a la API y no a `recuperar_fragmentos`; por eso fallaba. Esto viola la regla "no debilitar ni eliminar pruebas" de `AGENTS.md`. **Acción:** se restauraron las pruebas originales y se agregó la prueba corregida `test_reporte_de_actividades_devuelve_su_seccion` (29 pruebas en total). Lección: revisar siempre el `git diff` de `tests/` antes de aceptar un cambio del agente.
+
 ### Fallos
 - Ninguno en las ejecuciones 1 y 2.
 

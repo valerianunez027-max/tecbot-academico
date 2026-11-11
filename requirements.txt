@@ -1,6 +1,9 @@
 # API
 fastapi>=0.115
 uvicorn[standard]>=0.30
+# Día 3: base vectorial y modelo local (ver documentacion/arquitectura.md)
+chromadb>=0.5
+ollama>=0.3
 # Pruebas (TestClient de FastAPI necesita httpx)
 pytest>=8.0
 httpx>=0.27
