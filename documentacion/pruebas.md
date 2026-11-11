@@ -70,13 +70,25 @@
 | Subagente | Tarea | Resultado | Evidencia |
 |---|---|---|---|
 | `@arquitecto` | Impacto de ChromaDB en el contrato de `POST /api/consulta` | Correcto: el contrato no cambia, solo la lógica interna | `evidencias/arquitecto.png` |
-| `@disenador-web` | 3 mejoras de accesibilidad sin modificar archivos | Correcto, sin cambios en archivos | `evidencias/disenador.png` |
+| `@disenador-web` | 3 mejoras de accesibilidad sin modificar archivos | Correcto, sin cambios en archivos | `evidencias/diseñador.png` |
 | `@desarrollador` | Agregar prueba de "Reportes de actividades" | **Rechazado en revisión** (ver hallazgo) | `evidencias/desarrollador.png` |
-| `@tester` | Ejecutar `pytest -q` y `git status` | Pendiente | `evidencias/tester.png` |
+| `@tester` | Ejecutar `pytest -q` y `git status` | Correcto: todas las pruebas pasan; listó archivos modificados y sin rastrear | `evidencias/tester.png` |
 
 **Hallazgo en la revisión del desarrollador:** el agente reemplazó todo `tests/test_rag.py` (eliminó 13 pruebas existentes) y la prueba nueva usaba las claves `respuesta` y `fuentes`, que pertenecen a la API y no a `recuperar_fragmentos`; por eso fallaba. Esto viola la regla "no debilitar ni eliminar pruebas" de `AGENTS.md`. **Acción:** se restauraron las pruebas originales y se agregó la prueba corregida `test_reporte_de_actividades_devuelve_su_seccion` (29 pruebas en total). Lección: revisar siempre el `git diff` de `tests/` antes de aceptar un cambio del agente.
 
-### Fallos
+### Día 3 — RAG con ChromaDB — 11 de noviembre de 2026
+
+- Nuevas pruebas: `tests/test_fragmentacion.py` (sin ChromaDB) y `tests/test_vector.py` (se omiten si no hay índice).
+- `test_vector.py` cubre: documento esperado en top-3, metadatos y distancia, pregunta fuera del corpus más lejana que una cubierta, la API con ChromaDB cita `servicio-social.md` (actividad 6) y la cafetería sigue sin fuentes en modo `auto`.
+- Evaluación de recuperación: `python scripts/evaluar.py` → `evidencias/evaluacion-recuperacion.md`.
+- **Evaluación 1 (ChromaDB solo, umbral 0.5, Windows):** 7/9 correctos.
+  - Fallo 1: "¿Qué necesito para titularme?" → top-1 `servicio-social.md` (0.364); `titulacion.md` sí estaba en el top-3.
+  - Fallo 2: "¿Cuánto cuesta la titulación?" → respondió con `titulacion.md` (0.383) aunque los documentos no hablan de costos.
+  - Distancias traslapadas: peor válida 0.47 (acreditación), sin evidencia más cercana 0.38.
+- **Acción:** búsqueda híbrida (palabras clave deciden evidencia y documento; ChromaDB ordena con RRF; ChromaDB solo responde con distancia <= 0.30). Se agregaron pruebas para ambos fallos en `test_vector.py`.
+- **Evaluación 2 (híbrido):** [pegar resultado de `python scripts/evaluar.py`; esperado 9/9]
+- `pytest -q`: [pegar resultado]
+
 - Ninguno en las ejecuciones 1 y 2.
 
 ### Riesgos pendientes

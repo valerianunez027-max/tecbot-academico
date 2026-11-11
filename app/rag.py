@@ -111,11 +111,8 @@ def _indice(carpeta: Path = CARPETA_DOCUMENTOS) -> tuple[list[set[str]], dict[st
     return conjuntos, idf, idf_desconocida
 
 
-def recuperar_fragmentos(pregunta: str, limite: int = 3) -> list[Resultado]:
-    """Devuelve los fragmentos con evidencia suficiente, del más al menos relevante.
-
-    Si la pregunta no está cubierta por el corpus devuelve una lista vacía.
-    """
+def puntuar(pregunta: str) -> list[Resultado]:
+    """Todos los fragmentos con al menos una coincidencia, del mejor al peor (sin filtrar)."""
     consulta = set(raices(pregunta))
     if not consulta:
         return []
@@ -142,6 +139,15 @@ def recuperar_fragmentos(pregunta: str, limite: int = 3) -> list[Resultado]:
         )
 
     resultados.sort(key=lambda r: r["puntaje"], reverse=True)
+    return resultados
+
+
+def recuperar_fragmentos(pregunta: str, limite: int = 3) -> list[Resultado]:
+    """Devuelve los fragmentos con evidencia suficiente, del más al menos relevante.
+
+    Si la pregunta no está cubierta por el corpus devuelve una lista vacía.
+    """
+    resultados = puntuar(pregunta)
     if not resultados or resultados[0]["cobertura"] < UMBRAL_COBERTURA:
         return []
 

@@ -24,6 +24,9 @@ class Fuente(BaseModel):
     tema: str
     seccion: str
     fragmento: str = Field(description="Extracto del documento citado.")
+    distancia: float | None = Field(
+        default=None, description="Distancia coseno en ChromaDB (menor = más parecido); null con palabras clave."
+    )
 
 
 class ConsultaSalida(BaseModel):

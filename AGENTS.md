@@ -23,7 +23,8 @@ No incluye:
 ## Stack
 
 - Python 3.11+ con FastAPI + Uvicorn + Pydantic
-- Recuperación por palabra clave (Día 2); ChromaDB en el Día 3
+- ChromaDB (embeddings `all-MiniLM-L6-v2`) con respaldo por palabras clave
+- Ollama (`llama3.2:3b`) opcional para redactar respuestas
 - Frontend estático: HTML + CSS + JS (`tecbot-landing/`)
 - pytest + httpx para pruebas
 - OpenCode, Git y GitHub
@@ -32,8 +33,12 @@ No incluye:
 
 - `app/main.py` — entrada de FastAPI: `GET /salud`, `POST /api/consulta` y sirve la landing en `/`.
 - `app/schemas.py` — contrato de entrada y salida (Pydantic).
-- `app/rag.py` — fragmentación por sección y recuperación por palabra clave.
-- `app/generacion.py` — redacción extractiva de la respuesta (sin modelo todavía).
+- `app/config.py` — rutas y variables de entorno (`TECBOT_MOTOR`, `TECBOT_UMBRAL`, `TECBOT_GENERADOR`).
+- `app/rag.py` — fragmentación por sección y recuperación por palabra clave (respaldo).
+- `app/vector.py` — índice y consulta en ChromaDB (`chroma_db/`, no se versiona).
+- `app/busqueda.py` — búsqueda híbrida: palabras clave deciden la evidencia; ChromaDB ordena (RRF).
+- `app/generacion.py` — respuesta extractiva u Ollama con prompt anclado a los fragmentos.
+- `scripts/` — `indexar.py`, `consultar.py`, `evaluar.py`, `verificar_entorno.py`.
 - `tecbot-landing/` — interfaz: `index.html`, `styles.css`, `app.js`, `assets/logo.svg`.
 - `documentos-demo/` — corpus ficticio de demostración (solo lectura).
 - `documentacion/` — arquitectura, diseño, pruebas y evidencias.
@@ -47,6 +52,8 @@ No incluye:
 python -m venv .venv
 .venv\Scripts\Activate.ps1
 pip install -r requirements.txt
+python scripts\indexar.py         # crea chroma_db/ (repetir si cambian los documentos)
+python scripts\evaluar.py         # tabla de distancias en documentacion/evidencias/
 uvicorn app.main:app --reload     # abre http://localhost:8000
 pytest -q
 ```
@@ -72,15 +79,19 @@ el arquitecto no implementa; nadie modifica `documentos-demo/`.
    recomendar acudir al departamento correspondiente (`fuentes` vacío).
 4. No modificar `documentos-demo/` para “hacer que una respuesta funcione”.
 5. No agregar dependencias sin justificarlo y actualizar `requirements.txt`.
+   Tras cambiar `documentos-demo/` o la fragmentación, reindexar con `scripts/indexar.py`.
 6. No incluir credenciales, tokens, `.env` ni datos personales en el repositorio.
 7. Los documentos son material didáctico; nunca presentarlos como normativa oficial.
 
 ## Decisiones vigentes
 
-- Día 2: búsqueda por palabra clave con ponderación IDF y umbral de cobertura (0.6).
-  Se reemplaza por ChromaDB en el Día 3 **sin cambiar** la firma
-  `recuperar_fragmentos(pregunta, limite)` ni el contrato de la API.
-- Respuesta extractiva: se copia el fragmento principal; no hay modelo de lenguaje aún.
+- Día 3: búsqueda **híbrida**. Las palabras clave deciden si hay evidencia y el documento;
+  ChromaDB reordena las secciones con Reciprocal Rank Fusion. ChromaDB responde solo si la
+  distancia es <= `TECBOT_UMBRAL` (0.30). Motivo: con ChromaDB solo la evaluación dio 7/9
+  (embeddings en inglés; una pregunta sin respuesta quedó a 0.38 y una válida a 0.47).
+  El contrato de la API **no cambió** (solo se agregó `distancia` opcional en cada fuente).
+- Respuesta extractiva por defecto; `TECBOT_GENERADOR=ollama` redacta con `llama3.2:3b`.
+- Las pruebas de contrato usan `TECBOT_MOTOR=palabras` (deterministas); ChromaDB se prueba en `tests/test_vector.py`.
 - Las fuentes de una respuesta provienen de un solo documento para no mezclar temas.
 
 ## Convenciones

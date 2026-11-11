@@ -16,7 +16,7 @@ from app.generacion import (
     generar_respuesta,
     resumir_fragmento,
 )
-from app.rag import recuperar_fragmentos
+from app.busqueda import buscar
 from app.schemas import ConsultaEntrada, ConsultaSalida, Fuente
 
 CARPETA_LANDING = Path(__file__).resolve().parent.parent / "tecbot-landing"
@@ -24,7 +24,7 @@ CARPETA_LANDING = Path(__file__).resolve().parent.parent / "tecbot-landing"
 app = FastAPI(
     title="TecBot Académico",
     description="Asistente de información académica (prototipo didáctico, documentos ficticios).",
-    version="0.2.0",
+    version="0.3.0",
 )
 
 # CORS restringido: la landing abierta con doble clic (origen "null") y servidores locales.
@@ -49,7 +49,7 @@ def salud() -> dict[str, str]:
 
 @app.post("/api/consulta", response_model=ConsultaSalida)
 def consultar(entrada: ConsultaEntrada) -> ConsultaSalida:
-    fragmentos = recuperar_fragmentos(entrada.pregunta, limite=3)
+    fragmentos, _motor = buscar(entrada.pregunta, limite=3)
 
     if not fragmentos:
         return ConsultaSalida(
@@ -64,6 +64,7 @@ def consultar(entrada: ConsultaEntrada) -> ConsultaSalida:
             tema=f["tema"],
             seccion=f["seccion"],
             fragmento=resumir_fragmento(f),
+            distancia=f.get("distancia"),
         )
         for f in fragmentos
     ]

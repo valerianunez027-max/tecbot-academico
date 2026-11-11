@@ -16,6 +16,22 @@ flowchart TB
 
 En el Día 3 la recuperación pasa a ChromaDB y la redacción puede usar un modelo (Ollama u otro proveedor). Las firmas de `recuperar_fragmentos` y `generar_respuesta` no cambian.
 
+## 1.1 Vista Día 3 (RAG con ChromaDB)
+
+```mermaid
+flowchart TB
+    UI[tecbot-landing] -->|POST /api/consulta| API[FastAPI]
+    API --> B{app/busqueda.py}
+    B -->|1. ¿hay evidencia? ¿qué documento?| K[app/rag.py<br/>palabras clave]
+    B -->|2. orden por significado RRF| V[app/vector.py<br/>ChromaDB · chroma_db/]
+    API --> G{app/generacion.py}
+    G -->|extractivo| E[Fragmento citado]
+    G -->|TECBOT_GENERADOR=ollama| O[Ollama llama3.2:3b]
+    IDX[scripts/indexar.py] -->|26 fragmentos + metadatos| V
+```
+
+Fragmentación para ChromaDB: una entrada por sección `## ` (se omiten Propósito, Alcance, Límites y Fuente), subdividida si pasa de 800 caracteres con 120 de solapamiento. El texto indexado lleva el encabezado de la sección. Metadatos: `documento`, `tema`, `seccion`, `fragmento`, `tipo`. Métrica: coseno. Embeddings: `DefaultEmbeddingFunction` (all-MiniLM-L6-v2), el mismo al indexar y al consultar.
+
 ## 2. Componentes
 
 | Componente | Archivo | Responsabilidad |
@@ -88,6 +104,9 @@ Pregunta vacía, solo espacios o mayor a 1,000 caracteres: **422**.
 | Palabra clave + IDF en el Día 2 | Determinista, sin dependencias, permite probar el contrato ya | Embeddings desde el inicio |
 | Umbral de cobertura | Abstenerse ante preguntas fuera del corpus (cafetería, costos) | Responder siempre con el fragmento más parecido |
 | Respuesta extractiva | No inventa datos; no requiere clave de API | Modelo de lenguaje desde el Día 2 |
+| Búsqueda híbrida con RRF (Día 3) | Con ChromaDB solo la evaluación dio 7/9: elegía `servicio-social.md` para "titularme" y respondía "¿cuánto cuesta la titulación?" (distancia 0.38 < 0.47 de una válida). Las palabras clave deciden evidencia y documento; ChromaDB ordena | Solo ChromaDB con umbral; cambiar a un modelo de embeddings multilingüe (pendiente de evaluar) |
+| Candado de palabra en común | Evita responder instrucciones o preguntas sin relación que quedan "cerca" por casualidad | Confiar solo en la distancia |
+| Generación con Ollama opcional | Respuestas redactadas sin depender de internet; extractivo por defecto para pruebas deterministas | Modelo siempre activo |
 | Fuentes de un solo documento | Evita mezclar temas (matriz manual M-02) | Mezclar los mejores fragmentos de todo el corpus |
 | Landing servida por FastAPI | Mismo origen, sin configurar CORS amplio | Servidor estático aparte |
 | Agentes en `.opencode/agents/*.md` | Prompt y permisos en un solo archivo por rol | Definirlos en `opencode.json` con `{file:...}` |
@@ -101,6 +120,8 @@ Pregunta vacía, solo espacios o mayor a 1,000 caracteres: **422**.
 - `documentos-demo/` es de solo lectura para todos los agentes.
 
 ## 7. Limitaciones conocidas
+
+- El modelo de embeddings por defecto está entrenado sobre todo en inglés; revisar `documentacion/evidencias/evaluacion-recuperacion.md` y ajustar `TECBOT_UMBRAL`.
 
 - La búsqueda por palabra clave no entiende sinónimos salvo los definidos en `SINONIMOS` de `app/rag.py`.
 - Preguntas muy cortas o ambiguas pueden abstenerse aunque el tema exista.
