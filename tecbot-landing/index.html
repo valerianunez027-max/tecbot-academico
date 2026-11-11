@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TecBot Académico · Asistente de información académica</title>
+  <meta name="description" content="TecBot Académico: asistente con IA para resolver dudas sobre servicio social, residencias profesionales y titulación.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- ===== Navbar ===== -->
+  <header class="navbar">
+    <nav class="contenedor" aria-label="Navegación principal">
+      <a href="#inicio" class="logo" aria-label="TecBot Académico, inicio">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 60" role="img" aria-hidden="true">
+          <defs>
+            <linearGradient id="tbGrad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#22D3EE"/>
+              <stop offset="100%" stop-color="#10B981"/>
+            </linearGradient>
+          </defs>
+          <path d="M10 14 h34 a8 8 0 0 1 8 8 v16 a8 8 0 0 1 -8 8 h-18 l-9 8 v-8 h-7 a8 8 0 0 1 -8 -8 v-16 a8 8 0 0 1 8 -8z" fill="url(#tbGrad)"/>
+          <path d="M27 20 l13 5 -13 5 -13 -5z" fill="#0B1120"/>
+          <path d="M19 27.5 v5 c0 2 4 4 8 4 s8 -2 8 -4 v-5 l-8 3z" fill="#0B1120"/>
+          <circle cx="20" cy="40" r="2" fill="#0B1120"/>
+          <circle cx="27" cy="40" r="2" fill="#0B1120"/>
+          <circle cx="34" cy="40" r="2" fill="#0B1120"/>
+          <text x="64" y="30" font-family="'Plus Jakarta Sans', 'Segoe UI', sans-serif" font-size="20" font-weight="800" fill="currentColor">TecBot</text>
+          <text x="64" y="48" font-family="'Plus Jakarta Sans', 'Segoe UI', sans-serif" font-size="12" font-weight="500" letter-spacing="2" fill="url(#tbGrad)">ACADÉMICO</text>
+        </svg>
+      </a>
+
+      <input type="checkbox" id="menu-toggle" class="menu-toggle" aria-label="Abrir menú">
+      <label for="menu-toggle" class="menu-icono" aria-hidden="true">
+        <span></span><span></span><span></span>
+      </label>
+
+      <ul class="nav-enlaces">
+        <li><a href="#consulta">Consultar</a></li>
+        <li><a href="#caracteristicas">Características</a></li>
+        <li><a href="#proceso">Proceso</a></li>
+        <li><a href="#contacto">Contacto</a></li>
+      </ul>
+
+      <a href="#consulta" class="btn btn-primario nav-cta">Comenzar</a>
+    </nav>
+  </header>
+
+  <main>
+    <!-- ===== Hero ===== -->
+    <section class="hero" id="inicio">
+      <div class="contenedor">
+        <span class="badge">🎓 Demostración académica · Ciencias Revueltas 2026</span>
+        <h1>Tus dudas académicas, <span class="texto-gradiente">resueltas al instante</span></h1>
+        <p>TecBot Académico es un asistente con inteligencia artificial que responde preguntas sobre trámites y procesos del instituto, con base en documentos oficiales.</p>
+        <div class="hero-botones">
+          <a href="#consulta" class="btn btn-primario">Probar TecBot →</a>
+          <a href="#proceso" class="btn btn-secundario">Cómo funciona</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Consulta ===== -->
+    <section class="seccion" id="consulta">
+      <div class="contenedor contenedor-estrecho">
+        <div class="seccion-titulo">
+          <h2>Pregúntale a TecBot</h2>
+          <p>Escribe tu duda; TecBot busca en los documentos y te muestra la fuente.</p>
+        </div>
+
+        <div class="aviso" role="note">
+          <strong>Material didáctico.</strong> Las respuestas salen de documentos ficticios de demostración.
+          No son normativa oficial: confirma siempre con el departamento correspondiente.
+        </div>
+
+        <form class="consulta-form" id="consulta-form" novalidate>
+          <label for="pregunta" class="sr-only">Tu pregunta</label>
+          <textarea id="pregunta" name="pregunta" rows="3" maxlength="1000" required
+            placeholder="Ej. ¿Qué necesito para iniciar el servicio social?"></textarea>
+          <div class="consulta-acciones">
+            <span class="contador" id="contador" aria-live="polite">0 / 1000</span>
+            <button type="submit" class="btn btn-primario" id="boton-enviar">Preguntar</button>
+          </div>
+        </form>
+
+        <div class="ejemplos" aria-label="Preguntas de ejemplo">
+          <button type="button" class="chip">¿Qué necesito para el servicio social?</button>
+          <button type="button" class="chip">¿Cómo registro mi proyecto de residencias?</button>
+          <button type="button" class="chip">¿Cuáles son las modalidades de titulación?</button>
+          <button type="button" class="chip">¿Puedo acreditar una materia reprobada?</button>
+        </div>
+
+        <div class="resultado" id="resultado" aria-live="polite" hidden></div>
+      </div>
+    </section>
+
+    <!-- ===== Características ===== -->
+    <section class="seccion" id="caracteristicas">
+      <div class="contenedor">
+        <div class="seccion-titulo">
+          <h2>¿En qué te ayuda TecBot?</h2>
+          <p>Información clara sobre los procesos más consultados por estudiantes.</p>
+        </div>
+
+        <div class="grilla-tarjetas">
+          <article class="tarjeta">
+            <div class="tarjeta-icono">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+              </svg>
+            </div>
+            <h3>Servicio social</h3>
+            <p>Requisitos, créditos necesarios, documentos y fechas para iniciar y liberar tu servicio social.</p>
+          </article>
+
+          <article class="tarjeta">
+            <div class="tarjeta-icono">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+              </svg>
+            </div>
+            <h3>Residencias profesionales</h3>
+            <p>Cómo registrar tu proyecto, elegir empresa, asignar asesor y entregar reportes a tiempo.</p>
+          </article>
+
+          <article class="tarjeta">
+            <div class="tarjeta-icono">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M22 10 12 5 2 10l10 5 10-5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/>
+              </svg>
+            </div>
+            <h3>Titulación</h3>
+            <p>Opciones de titulación, trámites ante servicios escolares y pasos para obtener tu título.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Proceso ===== -->
+    <section class="seccion" id="proceso">
+      <div class="contenedor">
+        <div class="seccion-titulo">
+          <h2>Cómo funciona</h2>
+          <p>Tres pasos, sin filas ni ventanillas.</p>
+        </div>
+        <div class="pasos">
+          <div class="paso">
+            <h3>Pregunta</h3>
+            <p>Escribe tu duda en lenguaje natural, como se la harías a un compañero.</p>
+          </div>
+          <div class="paso">
+            <h3>Búsqueda</h3>
+            <p>TecBot consulta los reglamentos y lineamientos oficiales del instituto.</p>
+          </div>
+          <div class="paso">
+            <h3>Respuesta</h3>
+            <p>Recibes una respuesta clara con la fuente del documento consultado.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===== Footer ===== -->
+  <footer class="footer" id="contacto">
+    <div class="contenedor">
+      <p>TecBot Académico · Prototipo académico del curso “Creación de software con Agentes de IA”</p>
+      <p>Congreso Ciencias Revueltas 2026 · ITS Santiago Papasquiaro</p>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
