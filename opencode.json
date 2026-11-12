@@ -1,4 +1,61 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "instructions": ["AGENTS.md", "requerimientos.md"]
+  "instructions": [
+    "AGENTS.md",
+    "requerimientos.md"
+  ],
+  "mcp": {
+    "servers": {
+      "documentos_academicos": {
+        "type": "local",
+        "command": [
+          "C:\\Proyectos\\tec_bot\\.venv\\Scripts\\python.exe",
+          "C:\\Proyectos\\tec_bot\\scripts\\mcp_documentos.py",
+          "C:\\Proyectos\\tec_bot\\documentos-demo"
+        ],
+        "disabled": false,
+        "timeout": {
+          "startup": 30000,
+          "catalog": 30000
+        }
+      }
+    }
+  },
+  "permissions": [
+    {
+      "action": "documentos_academicos_*",
+      "resource": "*",
+      "effect": "deny"
+    },
+    {
+      "action": "documentos_academicos_list_*",
+      "resource": "*",
+      "effect": "allow"
+    },
+    {
+      "action": "documentos_academicos_directory_tree",
+      "resource": "*",
+      "effect": "allow"
+    },
+    {
+      "action": "documentos_academicos_search_files",
+      "resource": "*",
+      "effect": "allow"
+    },
+    {
+      "action": "documentos_academicos_get_file_info",
+      "resource": "*",
+      "effect": "allow"
+    },
+    {
+      "action": "documentos_academicos_read_*",
+      "resource": "*",
+      "effect": "ask"
+    },
+    {
+      "action": "edit",
+      "resource": "*documentos-demo*",
+      "effect": "deny"
+    }
+  ]
 }

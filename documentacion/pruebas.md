@@ -86,10 +86,26 @@
   - Fallo 2: "¿Cuánto cuesta la titulación?" → respondió con `titulacion.md` (0.383) aunque los documentos no hablan de costos.
   - Distancias traslapadas: peor válida 0.47 (acreditación), sin evidencia más cercana 0.38.
 - **Acción:** búsqueda híbrida (palabras clave deciden evidencia y documento; ChromaDB ordena con RRF; ChromaDB solo responde con distancia <= 0.30). Se agregaron pruebas para ambos fallos en `test_vector.py`.
-- **Evaluación 2 (híbrido):** [pegar resultado de `python scripts/evaluar.py`; esperado 9/9]
-- `pytest -q`: [pegar resultado]
+- **Evaluación 2 (híbrido, umbral 0.30, Windows):** **9/9** correctos. "Titularme" → `titulacion.md`; "¿Cuánto cuesta la titulación?", cafetería e instrucción "ignora los documentos" → sin fuentes. Evidencia: `evidencias/evaluacion-recuperacion.md`.
+- `pytest -q` (Windows, ChromaDB real): **39 passed** en 2.31 s.
 
-- Ninguno en las ejecuciones 1 y 2.
+### Día 3 — MCP Filesystem (acceso restringido) — 11 de noviembre de 2026
+
+- **Intento 1 (servidor oficial `@modelcontextprotocol/server-filesystem` con `npx`):** OpenCode mostró "Request timed out". `npm install -g` falló con `ECONNRESET`: la red del salón bloquea `registry.npmjs.org`.
+- **Solución:** servidor MCP propio, solo con la biblioteca estándar de Python: `scripts/mcp_documentos.py`. Expone únicamente herramientas de lectura (`list_allowed_directories`, `list_directory`, `read_text_file`, `search_files`, `get_file_info`); no existe ninguna tool de escritura. Toda ruta fuera de `documentos-demo/` se rechaza.
+- **Configuración** (`opencode.json`, formato V2 de OpenCode 2.x): `mcp.servers.documentos_academicos` con `type: local` y el Python del `.venv`. Permisos: `documentos_academicos_*` → `deny` por defecto; `list_*`, `search_files` y `get_file_info` → `allow`; `read_*` → `ask`; además `edit` sobre `*documentos-demo*` → `deny`, para que el agente tampoco escriba ahí con sus herramientas propias.
+- **Pruebas automatizadas** (`tests/test_mcp_documentos.py`, 9 casos): MCP-01 lista los cuatro documentos; MCP-02 lee un documento permitido; MCP-03 rechaza `../AGENTS.md`, `../.gitignore`, la ruta absoluta del README, `C:\Windows\System32\drivers\etc\hosts` y `/etc/hosts`; MCP-04 `write_file` no existe y no se crea `prueba.txt`.
+
+| ID | Caso | Resultado esperado | Estado |
+|---|---|---|---|
+| MCP-01 | Listar carpeta permitida | Cuatro documentos | Automatizada: pasa · OpenCode: pendiente |
+| MCP-02 | Leer documento permitido | Contenido correcto (pide aprobación) | Automatizada: pasa · OpenCode: pendiente |
+| MCP-03 | Leer fuera de la carpeta | Rechazo | Automatizada: pasa · OpenCode: el agente no leyó `C:\Windows\System32\drivers\etc\hosts` (solo explicó cómo abrirlo manualmente) |
+| MCP-04 | Escribir en la carpeta | Denegado | Automatizada: pasa · OpenCode: el agente no pudo crear `prueba.txt` (se canceló tras 10 min sin herramienta disponible); `dir documentos-demo` muestra solo los 4 documentos |
+| MCP-05 | Deshabilitar servidor (`"disabled": true`) | Tools ausentes | Pendiente |
+
+### Fallos
+- Ninguno en las ejecuciones 1 y 2. Los fallos de agentes y de recuperación están descritos en sus secciones.
 
 ### Riesgos pendientes
 - La búsqueda por palabra clave no reconoce sinónimos no listados (p. ej. "titularme" funciona por la raíz, pero "graduarme" no).

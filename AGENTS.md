@@ -38,7 +38,7 @@ No incluye:
 - `app/vector.py` — índice y consulta en ChromaDB (`chroma_db/`, no se versiona).
 - `app/busqueda.py` — búsqueda híbrida: palabras clave deciden la evidencia; ChromaDB ordena (RRF).
 - `app/generacion.py` — respuesta extractiva u Ollama con prompt anclado a los fragmentos.
-- `scripts/` — `indexar.py`, `consultar.py`, `evaluar.py`, `verificar_entorno.py`.
+- `scripts/` — `indexar.py`, `consultar.py`, `evaluar.py`, `verificar_entorno.py` y `mcp_documentos.py` (servidor MCP de solo lectura).
 - `tecbot-landing/` — interfaz: `index.html`, `styles.css`, `app.js`, `assets/logo.svg`.
 - `documentos-demo/` — corpus ficticio de demostración (solo lectura).
 - `documentacion/` — arquitectura, diseño, pruebas y evidencias.
@@ -67,6 +67,8 @@ pytest -q
 | `@disenador-web` | subagente | Sistema de diseño e interfaz | Solo `tecbot-landing/` y `documentacion/design.md` |
 | `@desarrollador` | subagente | Implementa endpoints, lógica y pruebas | `app/`, `tests/` (bash con permiso) |
 | `@tester` | subagente | Ejecuta pruebas y reporta defectos | No (solo pytest y git de lectura) |
+
+MCP: el servidor `documentos_academicos` solo lee `documentos-demo/` (ver `opencode.json`).
 
 Reglas entre agentes: un archivo, un dueño a la vez; el tester no edita código ni pruebas;
 el arquitecto no implementa; nadie modifica `documentos-demo/`.
